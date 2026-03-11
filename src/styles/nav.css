@@ -1,0 +1,53 @@
+/* === Small transparent navbar === */
+.navbar {
+  align-self: center;
+  background: transparent;
+  padding: 0.4rem 1rem;
+  display: flex;
+  justify-content: center;
+  margin-left: -5vw;
+}
+
+/* === Links === */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  position: relative;
+  text-decoration: none;
+  color: black;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+/* === Hover & active underline === */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background-color: #7092BE; /* blue underline */
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* Optional: emphasize active link */
+.nav-link.active {
+  color: black;
+  font-weight: 600;
+}

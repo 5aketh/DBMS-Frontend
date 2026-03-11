@@ -1,0 +1,125 @@
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: none;
+  background-color: transparent;
+  margin-top: 1vh;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  width: 100%;
+}
+
+.table-wrapper {
+  width: 100%;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  background: white;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+}
+
+td {
+  font-size: 11px;
+}
+
+th {
+  background-color: #7092BE;
+  color: white;
+  font-weight: 600;
+  min-width: max-content;
+}
+
+table.rounded-table thead th:first-child {
+  border-top-left-radius: 12px;
+}
+
+table.rounded-table thead th:last-child {
+  border-top-right-radius: 12px;
+}
+
+table.rounded-table tr:last-child td:first-child {
+  border-bottom-left-radius: 12px;
+}
+
+table.rounded-table tr:last-child td:last-child {
+  border-bottom-right-radius: 12px;
+}
+
+.table-row:hover td {
+  background-color: #eee;
+}
+
+.header-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3vh;
+}
+
+.limit-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: normal;
+}
+
+.btn-download {
+    background-color: #7092BE;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 10px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    transition: background-color 0.2s;
+}
+
+.btn-download:hover {
+    background-color: #607da0;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #7092BE;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #607da0;
+}
+
+.form {
+  display: none;
+}

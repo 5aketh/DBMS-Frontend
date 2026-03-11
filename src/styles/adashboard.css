@@ -1,0 +1,84 @@
+.faculty-list {
+  display: flex;
+  flex-wrap: wrap;
+  font-weight: normal;
+  justify-content: space-between;
+  justify-self: center;
+  margin-bottom: 4vh;
+}
+
+.faculty-box {
+  width: 25vw;
+  border-radius: 15px;
+  background-color: white;
+  border-radius: 30px;  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+  padding: 2.5vh 2vw;
+  padding-top: 5vh;
+  margin-top: 5vh;
+}
+
+.data-line {
+  display: flex;
+  margin-bottom: 2vh;
+  align-self: center;
+  justify-content: space-between;
+}
+
+.data-line p {
+  width: 20vw;
+  margin-right: 1vw;
+  margin: 0;
+}
+
+.data-line input {
+  width: 20vw;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 0;
+}
+
+.data-line button {
+  margin: 0;
+}
+
+.action-bts {
+  display: grid;
+  grid-template-columns: 33% 33% 33%;
+  width: max-content;
+}
+
+.action-bts button {
+  width: max-content;
+  justify-self: center;
+  background-color: #607da0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 1vh 1vw;
+  font-family: inherit;
+}
+
+.edit-btn {
+  width: max-content;
+  justify-self: center;
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.action-bts img:hover {
+  cursor: pointer;
+}
+
+.action-bts button:hover {
+  cursor: pointer;
+}
+
+.action-bts2 img:hover {
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  cursor: pointer;
+}

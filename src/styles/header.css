@@ -1,0 +1,59 @@
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    background-color: transparent;
+}
+
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-section:hover {
+    cursor: pointer;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+}
+
+.logo-section h1 {
+    color: #355075;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn {
+    background-color: #7092BE;
+    color: white;
+    border: none;
+    padding: 0 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: "WDXL Lubrifont JP N", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    display: flex;
+    flex-direction: row;
+    justify-items: self-start;
+    gap: 0.5vw;
+}
+
+.btn:hover {
+    background-color: #607da0;
+}
