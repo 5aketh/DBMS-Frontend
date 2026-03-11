@@ -13,7 +13,7 @@ export default function Welcome() {
     { name: "Conferences", path: "/conferences" },
   ], []);
 
-  const [items, setItems] = useState([]);
+  const [items] = useState([]);
   const [viewLimit, setViewLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTags, setSearchTags] = useState([]);
