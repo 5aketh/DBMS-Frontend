@@ -73,10 +73,10 @@ export default function Records() {
       />
 
       <div className="downloads">
-        <p>Download formats: </p>
-        <a onClick={() => downloadStructuredExcel([], bHeads, "Books")}>Books</a>
-        <a onClick={() => downloadStructuredExcel([], cHeads, "Conferences")}>Conferences</a>
-        <a onClick={() => downloadStructuredExcel([], jHeads, "Journals")}>Journals</a>
+        <h1>Download formats: </h1>
+        <p onClick={() => downloadStructuredExcel([], bHeads, "Books")}>Books</p>
+        <p onClick={() => downloadStructuredExcel([], cHeads, "Conferences")}>Conferences</p>
+        <p onClick={() => downloadStructuredExcel([], jHeads, "Journals")}>Journals</p>
       </div>
 
       <div style={{ marginBottom: "10vh", marginTop: "3vh" }}>

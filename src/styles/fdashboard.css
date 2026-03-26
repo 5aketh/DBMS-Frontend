@@ -8,21 +8,21 @@
   width: 30%;
 }
 
-.downloads p{
+.downloads h1{
   margin: 0;
+  font-size: small;
+  font-weight: normal;
+  align-content: center;
 }
 
-.downloads a{
+.downloads p{
   text-decoration: underline;
   text-transform: lowercase;
   color: #6593d3;
 }
 
-.downloads a:hover{
+.downloads p:hover{
   color: #355075;
-}
-
-.downloads a:hover{
   cursor: pointer;
 }
 
