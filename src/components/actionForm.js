@@ -22,7 +22,7 @@ export default function DynamicForm({ action, user="faculty", id=null, onClose }
     try {
       if (action === "Add Faculty") {
         await addFaculty(formData, localStorage.getItem("accessToken"));
-      } else if (action === "Update Faculty") {
+      } else if (action === "Update Faculty" || action === "Change Password") {
         await updateFaculty(formData);
       } else if (action === "Delete Faculty") {
         await deleteFaculty(Object.values(formData), localStorage.getItem("accessToken"));

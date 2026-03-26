@@ -8,24 +8,26 @@
 .login-container {
   display: flex;
   justify-self: end;
-  margin-top: 2%;
+  margin-top: 5%;
   background: white;
   width: 30%;
-  border-radius: 28px;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+  border-radius: 6%;
+  box-shadow: 0 20% 45% rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  padding: 60px;
+  padding: 6%;
   flex-direction: column;
   font-weight: normal;
 }
 
 .login-container h1 {
-  margin-bottom: 6px;
+  font-size: xx-large;
+  margin-bottom: 3%;
   color: #355075;
-
+  border-bottom: #000 1.5px solid;
 }
 
 .subtitle {
+  font-size: small;
   color: #666;
   margin-bottom: 30px;
 }

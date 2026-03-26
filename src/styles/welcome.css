@@ -28,14 +28,15 @@
 }
 
 .home_img {
-    width: 500px;
-    height: 400px;
+    width: 45%;
+    height: 40%;
     align-self: center;
     margin-top: 10vh;
+    margin-left: 4vw;
 }
 
 .error_img {
-    width: 700px;
+    width: 50%;
     height: auto;
     margin-left: 5vw;
 }
@@ -49,9 +50,9 @@
     align-self: center;
     text-align: start;
     padding: 5%;
-    margin-left: 10vw;
+    margin-left: 10%;
     gap: 2vh;
-    border-radius: 30px;
+    border-radius: 30%;
 }
 
 .btns-cont h2 {
@@ -93,4 +94,15 @@
     cursor: pointer;
     background-color: #7092BE;
     color: white;
+}
+
+.download {
+    position: relative;
+    width: max-content;
+    left: 88%;
+    background-color: #7092BE;
+    color: white;
+    padding: 2vh 2vw;
+    border-radius: 15px;
+    border: none;
 }

@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { fetchAllFactulty, updateFaculty } from "./api";
 import DynamicForm from "./actionForm";
 import Header from "./header";
-import Filter from "./filter";
 
 import "../styles/adashboard.css";
 
@@ -12,10 +11,6 @@ export default function ADashboard() {
   const navigate = useNavigate();
 
   const [facultyData, setFacultyData] = useState([]);
-  const [filters, setFilters] = useState({
-    searchTags: [],
-    currentPage: 1,
-  });
 
   const [sortMode, setSortMode] = useState("");
 
@@ -49,45 +44,11 @@ export default function ADashboard() {
     loadData();
   }, [loadData]);
 
-  /* ================= FILTER ================= */
-
-  const filteredFaculty = useMemo(() => {
-    if (!filters.searchTags.length) return facultyData;
-
-    return facultyData.filter(([_, data]) => {
-      const entries = Object.entries(data);
-
-      return filters.searchTags.every((tag) => {
-        const q = tag.value.toLowerCase();
-
-        if (tag.type === "column") {
-          const matchingKeys = entries
-            .map(([k]) => k)
-            .filter((k) => k.toLowerCase().includes(q));
-
-          return matchingKeys.some((key) => {
-            const val = data[key];
-            return (
-              val !== null &&
-              val !== undefined &&
-              String(val).trim() !== ""
-            );
-          });
-        }
-
-        return entries.some(
-          ([k, v]) =>
-            k.toLowerCase().includes(q) ||
-            String(v).toLowerCase().includes(q)
-        );
-      });
-    });
-  }, [facultyData, filters.searchTags]);
 
   /* ================= SORT ================= */
 
   const sortedFaculty = useMemo(() => {
-    const arr = [...filteredFaculty];
+    const arr = [...facultyData];
 
     switch (sortMode) {
       case "name-asc":
@@ -109,7 +70,7 @@ export default function ADashboard() {
       default:
         return arr;
     }
-  }, [filteredFaculty, sortMode]);
+  }, [facultyData, sortMode]);
 
   /* ================= FORM ================= */
 
@@ -147,9 +108,6 @@ export default function ADashboard() {
           { name: "Records", path: "/records" },
         ]}
       />
-
-      {/* FILTER */}
-      <Filter page={filters.currentPage} onChange={setFilters} />
 
       {/* SORT CONTROLS */}
 

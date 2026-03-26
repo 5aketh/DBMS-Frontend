@@ -14,7 +14,7 @@
     position: relative;
     background-color: white;
     padding: 5vh 5vw;
-    z-index: 1000;
+    z-index: 1;
     align-self: center;
     justify-self: center;
     left: 30%;
@@ -48,6 +48,7 @@
 .form-button {
     display: flex;
     justify-self: center;
+    justify-content: center;
     padding: 2vh 10vw;
     border-radius: 12px;
     border: none;

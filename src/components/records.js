@@ -3,25 +3,21 @@ import { useState, useRef } from "react";
 import Header from "./header";
 import Table from "./table";
 import DynamicForm from "./actionForm";
-import Filter from "./filter";
+import { downloadStructuredExcel } from "./excelFormatting";
 
 import { uploadFile } from "./api";
 
 export default function Records() {
   const [formAction, setFormAction] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [items, setItems] = useState([]);
-  const [viewLimit, setViewLimit] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTags, setSearchTags] = useState([]);
   const [uploading, setUploading] = useState(false);
-
-  const [tableModes, setTableModes] = useState({}); 
-  // { journals: "view", books: "edit", conferences: "delete" }
-
+  const [tableModes, setTableModes] = useState({});
   const fileInputRefs = useRef({});
 
   const types = ["Journals", "Books", "Conferences"];
+  const bHeads = ["title", "publisher_details", "publication_month_year", "name", "email"];
+  const cHeads = ["title_of_paper", "conference_name", "held_on", "place", "isbn", "name", "email"];
+  const jHeads = ["title_of_paper", "journal_name", "url_doi", "issn", "publication_month_year", "page_numbers", "name", "email"];
 
   const openAddForm = (action, type = null) => {
     setFormAction(`${action} ${type}`);
@@ -76,17 +72,17 @@ export default function Records() {
         ]}
       />
 
-      <Filter
-        page={currentPage}
-        onChange={({ searchTags: tags, currentPage: page }) => {
-          setSearchTags(tags);
-          setCurrentPage(page);
-        }}
-      />
+      <div className="downloads">
+        <p>Download formats: </p>
+        <a onClick={() => downloadStructuredExcel([], bHeads, "Books")}>Books</a>
+        <a onClick={() => downloadStructuredExcel([], cHeads, "Conferences")}>Conferences</a>
+        <a onClick={() => downloadStructuredExcel([], jHeads, "Journals")}>Journals</a>
+      </div>
 
       <div style={{ marginBottom: "10vh", marginTop: "3vh" }}>
         {types.map((type) => {
           const key = type.toLowerCase();
+          const mode = tableModes[key] || "view";
 
           return (
             <div key={type}>
@@ -105,61 +101,84 @@ export default function Records() {
                     style={{ display: "none" }}
                   />
 
-                  {/* upload */}
-                  <img
-                    src="/svgs/upload.svg"
-                    alt="upload"
-                    style={{ cursor: "pointer" }}
-                    onClick={() =>
-                      fileInputRefs.current[key]?.click()
-                    }
-                  />
+                  {/* NORMAL MODE */}
+                  {mode === "view" ? (
+                    <>
+                      <img
+                        src="/svgs/upload.svg"
+                        alt="upload"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => fileInputRefs.current[key]?.click()}
+                      />
 
-                  {/* add */}
-                  <img
-                    src="/svgs/add.svg"
-                    alt="add"
-                    style={{ cursor: "pointer" }}
-                    onClick={() =>
-                      openAddForm("Add", key)
-                    }
-                  />
+                      <img
+                        src="/svgs/add.svg"
+                        alt="add"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => openAddForm("Add", key)}
+                      />
 
-                  {/* edit */}
-                  <img
-                    src="/svgs/edit.svg"
-                    alt="edit"
-                    style={{ cursor: "pointer" }}
-                    onClick={() =>
-                      changeTableMode(key, "edit")
-                    }
-                  />
+                      <img
+                        src="/svgs/edit.svg"
+                        alt="edit"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => changeTableMode(key, "edit")}
+                      />
 
-                  {/* delete */}
-                  <img
-                    src="/svgs/delete.svg"
-                    alt="delete"
-                    style={{ cursor: "pointer" }}
-                    onClick={() =>
-                      changeTableMode(key, "delete")
-                    }
-                  />
+                      <img
+                        src="/svgs/delete.svg"
+                        alt="delete"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => changeTableMode(key, "delete")}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      {/* CONFIRM */}
+                      <button
+                        style={{
+                          backgroundColor: mode === "delete" ? "#e74c3c" : "#355075",
+                          color: "white",
+                          border: "none",
+                          padding: "6px 14px",
+                          borderRadius: "6px",
+                          cursor: "pointer"
+                        }}
+                        onClick={async () => {
+                          const actions = window.__TABLE_ACTIONS__?.[key];
+                          if (mode === "edit") {
+                            await actions?.save();
+                          }
+                          if (mode === "delete") {
+                            await actions?.delete();
+                          }
+                          changeTableMode(key, "view");
+                        }}
+                      >
+                        {mode === "delete" ? "Delete" : "Save"}
+                      </button>
+
+                      {/* CANCEL */}
+                      <span
+                        style={{
+                          color: "red",
+                          fontSize: "18px",
+                          cursor: "pointer",
+                          marginLeft: "10px"
+                        }}
+                        onClick={() => changeTableMode(key, "view")}
+                      >
+                        ✖
+                      </span>
+                    </>
+                  )}
 
                 </div>
               </div>
 
               <Table
                 type={key}
-                mode={tableModes[key] || "view"}
-                items={items}
-                searchTags={searchTags}
-                viewLimit={viewLimit}
-                currentPage={currentPage}
-                onChange={({ displayItems, currentPage, viewLimit }) => {
-                  setItems(displayItems);
-                  setCurrentPage(currentPage);
-                  setViewLimit(viewLimit);
-                }}
+                mode={mode}
               />
             </div>
           );

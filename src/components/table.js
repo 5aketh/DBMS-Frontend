@@ -1,262 +1,187 @@
 import { useState, useEffect, useMemo } from "react";
-import { fetchData } from "./api";
+import { fetchData, updateRecord, deleteRecord } from "./api";
 import "../styles/table.css";
 
 export default function Table({
   type,
   searchTags = [],
-  viewLimit = 10,
-  currentPage = 1
+  visibleColumns = [],
+  mode = "view",
 }) {
-
   const [items, setItems] = useState([]);
-  const [sortConfig, setSortConfig] = useState(null);
+  const [editedRows, setEditedRows] = useState({});
+  const [selectedRows, setSelectedRows] = useState({});
 
   useEffect(() => {
-
-    const loadData = async () => {
-
-      const fetched = await fetchData(type);
-
-      if (Array.isArray(fetched))
-        setItems(fetched);
+    const load = async () => {
+      const res = await fetchData(type);
+      if (Array.isArray(res)) setItems(res);
     };
-
-    loadData();
-
+    load();
   }, [type]);
-
-  /* ---------- DATE PARSER ---------- */
-
-  const parseDate = (value) => {
-
-    if (!value) return null;
-
-    const parsed = new Date(value);
-
-    if (!isNaN(parsed))
-      return parsed;
-
-    if (!isNaN(value))
-      return new Date(value, 0);
-
-    return null;
-  };
 
   /* ---------- FILTER ---------- */
 
-  const filteredItems = useMemo(() => {
-
-    if (!searchTags.length)
-      return items;
-
-    return items.filter(row =>
-
-      searchTags.every(tag => {
-
-        const q = tag.value.toLowerCase();
-
-        /* ---------- MONTH RANGE ---------- */
-
-        if (tag.type === "monthRange") {
-
-          const months = {
-            jan:0,feb:1,mar:2,apr:3,may:4,jun:5,
-            jul:6,aug:7,sep:8,oct:9,nov:10,dec:11
-          };
-
-          const [start,end] = q.split("-");
-
-          const startM = months[start];
-          const endM = months[end];
-
-          return Object.values(row).some(v => {
-
-            const d = parseDate(v);
-
-            if (!d) return false;
-
-            const m = d.getMonth();
-
-            return m >= startM && m <= endM;
-
-          });
-
-        }
-
-        /* ---------- COLUMN SEARCH ---------- */
-
-        if (tag.type === "column") {
-
-          const matchingKeys =
-            Object.keys(row).filter(k =>
-              k.toLowerCase().includes(q)
-            );
-
-          return matchingKeys.some(key => {
-
-            const val = row[key];
-
-            return val !== null &&
-              val !== undefined &&
-              String(val).trim() !== "";
-
-          });
-
-        }
-
-        /* ---------- KEYWORD ---------- */
-
-        return Object.entries(row).some(([k,v]) =>
-
-          k.toLowerCase().includes(q) ||
-          String(v).toLowerCase().includes(q)
-
-        );
-
-      })
-
-    );
-
+  const filtered = useMemo(() => {
+    return items.filter(row => 
+      searchTags.every(tag => { 
+        if (tag.type === "keyword") { 
+          return Object.values(row).some(v => 
+            String(v).toLowerCase().includes(tag.value)
+          ); 
+        } 
+        if (tag.type === "type") { 
+          return String(row.type || "").toLowerCase() === tag.value; 
+        } 
+        if (tag.type === "faculty") { 
+          const rowValue = String(row.faculty_name || "").toLowerCase(); 
+          return searchTags.filter(t => t.type === "faculty").some(t => rowValue.includes(t.value)); 
+        } 
+        if (tag.type === "date") { 
+          const [start, end] = tag.value.split("_"); 
+          const s = new Date(start); 
+          const e = new Date(end); 
+          return Object.values(row).some(v => 
+            { const d = new Date(v); 
+              if (isNaN(d)) 
+                return false; 
+              return d >= s && d <= e; 
+            }
+          ); 
+        } return true; }));
   }, [items, searchTags]);
-
-  /* ---------- SORT ---------- */
-
-  const sortedItems = useMemo(() => {
-
-    if (!sortConfig)
-      return filteredItems;
-
-    const { key, direction } = sortConfig;
-
-    return [...filteredItems].sort((a,b)=>{
-
-      let A = a[key];
-      let B = b[key];
-
-      const dateA = parseDate(A);
-      const dateB = parseDate(B);
-
-      if (dateA && dateB)
-        return direction === "asc"
-          ? dateA - dateB
-          : dateB - dateA;
-
-      if (!isNaN(A) && !isNaN(B))
-        return direction === "asc"
-          ? A - B
-          : B - A;
-
-      return direction === "asc"
-        ? String(A).localeCompare(String(B))
-        : String(B).localeCompare(String(A));
-
-    });
-
-  }, [filteredItems, sortConfig]);
 
   /* ---------- COLUMNS ---------- */
 
   const columns = useMemo(() => {
+    if (!filtered.length) return [];
+    const all = Object.keys(filtered[0]).filter(k => k !== "faculty_id");
+    return visibleColumns.length ? all.filter(c => visibleColumns.includes(c)) : all;
+  }, [filtered, visibleColumns]);
 
-    if (!sortedItems.length)
-      return [];
+  /* ---------- EDIT HANDLERS ---------- */
 
-    const keys =
-      Object.keys(sortedItems[0])
-        .filter(k => k !== "faculty_id");
+  const handleEditChange = (rowIndex, col, value) => {
+    setEditedRows(prev => ({
+      ...prev,
+      [rowIndex]: {
+        ...prev[rowIndex],
+        [col]: value
+      }
+    }));
+  };
 
-    return keys.includes("id")
-      ? ["id", ...keys.filter(k => k !== "id")]
-      : keys;
+  const handleSave = async () => {
+    const token = localStorage.getItem("accessToken");
 
-  }, [sortedItems]);
+    for (let i = 0; i < filtered.length; i++) {
+      const row = filtered[i];
+      const updatedData = editedRows[i];
 
-  /* ---------- PAGINATION ---------- */
+      if (updatedData) {
+        await updateRecord(row.id, updatedData, type, token);
+      }
+    }
 
-  const paginatedItems = useMemo(() => {
+    setEditedRows({});
+  };
 
-    const start = (currentPage - 1) * viewLimit;
+  /* ---------- DELETE HANDLERS ---------- */
 
-    return sortedItems.slice(
-      start,
-      start + viewLimit
-    );
+  const toggleSelect = (id) => {
+    setSelectedRows(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
-  }, [sortedItems, currentPage, viewLimit]);
+  const handleDelete = async () => {
+    const token = localStorage.getItem("accessToken");
 
-  /* ---------- SORT HANDLER ---------- */
+    for (let id in selectedRows) {
+      if (selectedRows[id]) {
+        await deleteRecord(type, id, token);
+      }
+    }
 
-  const handleSort = (col) => {
+    setSelectedRows({});
+  };
 
-    setSortConfig(prev => {
+  /* ---------- MODE ACTION ---------- */
 
-      if (!prev || prev.key !== col)
-        return { key: col, direction: "asc" };
+  useEffect(() => {
+    if (mode === "view") return;
 
-      if (prev.direction === "asc")
-        return { key: col, direction: "desc" };
+    if (mode === "edit") {
+      // wait for parent save trigger
+    }
 
-      return null;
+    if (mode === "delete") {
+      // wait for parent delete trigger
+    }
+  }, [mode]);
 
-    });
-
+  /* expose actions to parent via window (simple hack based on your structure) */
+  window.__TABLE_ACTIONS__ = window.__TABLE_ACTIONS__ || {};
+  window.__TABLE_ACTIONS__[type] = {
+    save: handleSave,
+    delete: handleDelete
   };
 
   return (
-
     <div className="table-scroll">
-
       <table className="rounded-table">
-
         <thead>
-
           <tr>
-
+            {mode === "delete" && <th>Select</th>}
             {columns.map(col => (
-
-              <th
-                key={col}
-                onClick={() => handleSort(col)}
-                style={{cursor:"pointer"}}
-              >
-
-                {col.toUpperCase().replaceAll("_"," ")}
-
-                {sortConfig?.key === col &&
-                  (sortConfig.direction === "asc" ? " ↑" : " ↓")}
-
-              </th>
-
+              <th key={col}>{col.toUpperCase()}</th>
             ))}
-
           </tr>
-
         </thead>
 
         <tbody>
-
-          {paginatedItems.map((row,i)=>(
-
+          {filtered.map((row, i) => (
             <tr key={i}>
 
-              {columns.map(col => (
-
-                <td key={col}>
-                  {row[col] ?? "—"}
+              {/* DELETE CHECKBOX */}
+              {mode === "delete" && (
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={!!selectedRows[row.id]}
+                    onChange={() => toggleSelect(row.id)}
+                  />
                 </td>
+              )}
 
-              ))}
+              {columns.map(col => {
+                const isEditable =
+                  mode === "edit" &&
+                  col !== "id" &&
+                  col !== "faculty_name";
 
+                return (
+                  <td key={col}>
+                    {isEditable ? (
+                      <input
+                        value={
+                          editedRows[i]?.[col] ?? row[col] ?? ""
+                        }
+                        onChange={(e) =>
+                          handleEditChange(i, col, e.target.value)
+                        }
+                      />
+                    ) : (
+                      row[col] ?? "—"
+                    )}
+                  </td>
+                );
+              })}
             </tr>
-
           ))}
-
         </tbody>
-
       </table>
-
     </div>
-
   );
 }

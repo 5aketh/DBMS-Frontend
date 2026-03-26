@@ -1,5 +1,4 @@
-// api.js
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://bmsce-papers.onrender.com";
 
 export const userAuth = async (email, pass) => {
   const data = new URLSearchParams();
