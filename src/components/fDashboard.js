@@ -6,7 +6,7 @@ import Table from "./table";
 import DynamicForm from "./actionForm";
 import Header from "./header";
 import { downloadStructuredExcel } from "./excelFormatting";
-import { fetchFacultyData, uploadFile, updateFaculty } from "./api";
+import { fetchFacultyData, uploadFile } from "./api";
 
 import "../styles/fdashboard.css";
 
@@ -19,7 +19,6 @@ export default function FDashboard() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [deleteMode, setDeleteMode] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [expandedSections, setExpandedSections] = useState({});
   const [uploading, setUploading] = useState(false);
 
@@ -35,7 +34,7 @@ export default function FDashboard() {
   const cHeads = ["title_of_paper", "conference_name", "held_on", "place", "isbn", "name", "email"];
   const jHeads = ["title_of_paper", "journal_name", "url_doi", "issn", "publication_month_year", "page_numbers", "name", "email"];
 
-  const types = ["books", "conferences", "journals"];
+  const types = useMemo(() => ["books", "conferences", "journals"], []);
   const COLORS = ["#47B39C", "#FFC154", "#EC6B56"];
 
   /* ================= LOAD DATA ================= */
@@ -74,7 +73,7 @@ export default function FDashboard() {
       const dataArray = userData?.[type] || [];
       return { name: type, value: dataArray.length };
     });
-  }, [userData]);
+  }, [userData, types]);
 
   /* ================= FORM ================= */
   const openAddForm = (action, type = null) => {
@@ -117,7 +116,6 @@ export default function FDashboard() {
   const handleCancel = () => {
     setEditMode(false);
     setDeleteMode(false);
-    setSelectedRows([]);
   };
 
   /* ================= ACTIVE TYPE ================= */
@@ -195,10 +193,10 @@ export default function FDashboard() {
       {uploading && <div className="loading">Uploading...</div>}
 
       <div className="downloads">
-        <p>Download formats: </p>
-        <a onClick={() => downloadStructuredExcel([], bHeads, "Books")}>Books</a>
-        <a onClick={() => downloadStructuredExcel([], cHeads, "Conferences")}>Conferences</a>
-        <a onClick={() => downloadStructuredExcel([], jHeads, "Journals")}>Journals</a>
+        <h1>Download formats: </h1>
+        <p onClick={() => downloadStructuredExcel([], bHeads, "Books")}>Books</p>
+        <p onClick={() => downloadStructuredExcel([], cHeads, "Conferences")}>Conferences</p>
+        <p onClick={() => downloadStructuredExcel([], jHeads, "Journals")}>Journals</p>
       </div>
 
       <div className="user-details">
@@ -297,10 +295,10 @@ export default function FDashboard() {
                           ref={(el) => (fileInputRefs.current[key] = el)}
                           onChange={(e) => fileUpload(e, key)}
                         />
-                        <img src="/svgs/upload.svg" alt="upload" onClick={() => fileInputRefs.current[key]?.click()} />
-                        <img src="/svgs/add.svg" onClick={(e) => { e.stopPropagation(); openAddForm("Add", type); }} />
-                        <img src="/svgs/edit.svg" onClick={handleEditClick} />
-                        <img src="/svgs/delete.svg" onClick={handleDeleteClick} />
+                        <img src="/svgs/upload.svg" alt="upload" onClick={() => fileInputRefs.current[key]?.click()}/>
+                        <img src="/svgs/add.svg" alt="add" onClick={(e) => { e.stopPropagation(); openAddForm("Add", type); }} />
+                        <img src="/svgs/edit.svg" alt="edit" onClick={handleEditClick} />
+                        <img src="/svgs/delete.svg" alt="delete" onClick={handleDeleteClick} />
                       </>
                     )}
 
