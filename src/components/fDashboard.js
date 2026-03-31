@@ -214,25 +214,20 @@ export default function FDashboard() {
 
         <div className="right-side">
           <img src="/images/bms.png" alt="BMS" className="bg-img-icon" />
-          // <img src={userData.image} alt="Profile" className="img-icon" />
+          <img src="/images/pfp.png" alt="Profile" className="img-icon" />
 
           <div className="user-data">
             <h1>{userData.name}</h1>
-            // <p>{userData.title}</p>
-            // <p>{userData.degrees?.replaceAll(", ", " | ") || ""}</p>
             <p>{userData.department}</p>
           </div>
 
           <button className="passChange" onClick={(e) => { e.stopPropagation(); openAddForm("Change", "Password"); }}>change password</button>
-
-          // <div className="interests">{userData.interests}</div>
 
           <div className="contact-info">
             <div style={{ display: "flex", alignItems: "center" }}>
               <img src="/images/gmail.png" alt="Gmail" style={{ width: "20px", marginRight: "10px" }} />
               <p style={{ margin: 0 }}>{userData.email}</p>
             </div>
-            // <a href={`${userData.link}`}> view more </a>
           </div>
         </div>
       </div>
