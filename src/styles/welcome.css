@@ -106,3 +106,7 @@
     border-radius: 15px;
     border: none;
 }
+
+.download:hover {
+    cursor: pointer;
+}
