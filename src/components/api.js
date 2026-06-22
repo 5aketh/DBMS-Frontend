@@ -170,10 +170,10 @@ export const addFaculty = async (facultyData, accessToken) => {
     const result = await response.json();
 
     if (!response.ok) {
+      console.log("Validation Error Details:", result); // <-- ADD THIS TEMPORARILY
       return {
         success: false,
-        message: null,
-        error: result.detail || result.error || `HTTP ${response.status}`,
+        error: result.detail || `HTTP ${response.status}`,
       };
     }
 
