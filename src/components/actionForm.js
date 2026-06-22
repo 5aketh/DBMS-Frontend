@@ -36,24 +36,43 @@ export default function DynamicForm({ action, user="faculty", id=null, onClose }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // 1. Start with whatever the user actually typed or selected
+    let finalPayload = { ...formData };
+
+    // 2. Scan the current inputs configuration to inject hidden/preset defaults
+    inputs.forEach(field => {
+      if (finalPayload[field.name] === undefined) {
+        if (field.value !== undefined) {
+          finalPayload[field.name] = field.value;
+        } else if (field.defaultValue !== undefined) {
+          finalPayload[field.name] = field.defaultValue;
+        } else if (field.default !== undefined) {
+          finalPayload[field.name] = field.default;
+        } else if (field.type === "checkbox") {
+          finalPayload[field.name] = true; // Default fallback for hidden checkboxes
+        }
+      }
+    });
+
     try {
+      // 3. Pass 'finalPayload' to all API functions
       if (action === "Add Faculty") {
-        await addFaculty(formData, localStorage.getItem("accessToken"));
+        await addFaculty(finalPayload, localStorage.getItem("accessToken"));
       } else if (action === "Update Faculty" || action === "Change Password") {
-        await updateFaculty(formData);
+        await updateFaculty(finalPayload);
       } else if (action === "Delete Faculty") {
-        await deleteFaculty(Object.values(formData), localStorage.getItem("accessToken"));
+        await deleteFaculty(Object.values(finalPayload), localStorage.getItem("accessToken"));
       } else if (action.startsWith("Add ")) {
         const type = action.replace("Add ", "").toLowerCase();
-        await addRecord(formData, type, localStorage.getItem("accessToken"));
+        await addRecord(finalPayload, type, localStorage.getItem("accessToken"));
       } else if (action.startsWith("Update ")) {
         const type = action.replace("Update ", "").toLowerCase();
-        const { id, ...dataToUpdate } = formData;
+        const { id, ...dataToUpdate } = finalPayload;
         const token = localStorage.getItem("accessToken");
         await updateRecord(id, dataToUpdate, type, token);
       } else {
         const type = action.replace("Delete ", "").toLowerCase();
-        await deleteRecord(type, Object.values(formData), localStorage.getItem("accessToken"))
+        await deleteRecord(type, Object.values(finalPayload), localStorage.getItem("accessToken"));
       }
 
       onClose(); // CLOSE MODAL ON SUCCESS
