@@ -10,8 +10,10 @@ export default function DynamicForm({ action, user="faculty", id=null, onClose }
 
   // Auto-populate state with config defaults on load
   useEffect(() => {
+    const currentInputs = formConfig({ action, user });
     const initialData = {};
-    inputs.forEach(field => {
+    
+    currentInputs.forEach(field => {
       if (field.type === "checkbox") {
         initialData[field.name] = field.default !== undefined ? field.default : true;
       } else if (field.value !== undefined) {
