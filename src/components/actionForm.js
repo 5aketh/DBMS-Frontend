@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formConfig } from "./formConfigs";
 import { addFaculty, updateFaculty, deleteFaculty, addRecord, updateRecord, deleteRecord } from "./api";
 
@@ -7,6 +7,21 @@ import "../styles/form.css";
 export default function DynamicForm({ action, user="faculty", id=null, onClose }) {
   const inputs = formConfig({ action, user });
   const [formData, setFormData] = useState({});
+
+  // Auto-populate state with config defaults on load
+  useEffect(() => {
+    const initialData = {};
+    inputs.forEach(field => {
+      if (field.type === "checkbox") {
+        initialData[field.name] = field.default !== undefined ? field.default : true;
+      } else if (field.value !== undefined) {
+        initialData[field.name] = field.value;
+      } else if (field.defaultValue !== undefined) {
+        initialData[field.name] = field.defaultValue;
+      }
+    });
+    setFormData(initialData);
+  }, [action, user]); // Re-runs if the action or user type changes
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
@@ -26,10 +41,10 @@ export default function DynamicForm({ action, user="faculty", id=null, onClose }
         await updateFaculty(formData);
       } else if (action === "Delete Faculty") {
         await deleteFaculty(Object.values(formData), localStorage.getItem("accessToken"));
-      }else if (action.startsWith("Add ")) {
+      } else if (action.startsWith("Add ")) {
         const type = action.replace("Add ", "").toLowerCase();
         await addRecord(formData, type, localStorage.getItem("accessToken"));
-      }else if (action.startsWith("Update ")) {
+      } else if (action.startsWith("Update ")) {
         const type = action.replace("Update ", "").toLowerCase();
         const { id, ...dataToUpdate } = formData;
         const token = localStorage.getItem("accessToken");
@@ -61,21 +76,24 @@ export default function DynamicForm({ action, user="faculty", id=null, onClose }
 
         {inputs.map(field =>
           field.type === "checkbox" ? (
-            <label key={field.name} className="checkbox-label" style={{display:"none"}}>
+            // Style set to inherit whatever display setting comes from config
+            <label key={field.name} className="checkbox-label" style={{display: field.display || "none"}}>
               <input
                 type="checkbox"
                 name={field.name}
-                checked={true}
+                // Check state layer rather than a static true value
+                checked={formData[field.name] ?? true}
                 onChange={handleChange}
               />
               {field.placeholder}
             </label>
           ) : field.type === "select" ? (
             <select
+              key={field.name}
               name={field.name}
               required={field.required}
               className="form-inputs"
-              value={formData[field.name] || field.defaultValue || ""}
+              value={formData[field.name] || ""}
               onChange={handleChange}
             >
               <option value="" disabled>{field.label}</option>
@@ -89,7 +107,8 @@ export default function DynamicForm({ action, user="faculty", id=null, onClose }
               name={field.name}
               type={field.type}
               placeholder={field.placeholder}
-              value={field.value}
+              // Connect completely to state so preloaded values don't block user edits
+              value={formData[field.name] || ""}
               required={field.required}
               style={{display:field.display}}
               className="form-inputs"
